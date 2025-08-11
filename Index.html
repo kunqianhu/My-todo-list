@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List</title>
+  <style>
+    body { font-family: sans-serif; background: #f5f5f5; padding: 10px; }
+    h1 { text-align: center; }
+    .task { display: flex; justify-content: space-between; padding: 8px; margin: 4px 0; background: #fff; border-radius: 5px; }
+    .high { border-left: 5px solid red; }
+    .medium { border-left: 5px solid orange; }
+    .low { border-left: 5px solid green; }
+    select, input, button { padding: 5px; font-size: 16px; }
+    button { background: #007bff; color: white; border: none; border-radius: 3px; }
+    button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <h1>📋 To-Do List</h1>
+
+  <div>
+    <input id="taskInput" type="text" placeholder="Task">
+    <input id="categoryInput" type="text" placeholder="Category">
+    <select id="priorityInput">
+      <option value="high">High</option>
+      <option value="medium">Medium</option>
+      <option value="low">Low</option>
+    </select>
+    <button onclick="addTask()">Add</button>
+  </div>
+
+  <div id="taskList"></div>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    renderTasks();
+
+    function addTask() {
+      let text = document.getElementById("taskInput").value.trim();
+      let category = document.getElementById("categoryInput").value.trim();
+      let priority = document.getElementById("priorityInput").value;
+      if (text) {
+        tasks.push({ text, category, priority });
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        document.getElementById("taskInput").value = "";
+        document.getElementById("categoryInput").value = "";
+        renderTasks();
+      }
+    }
+
+    function removeTask(index) {
+      tasks.splice(index, 1);
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+      renderTasks();
+    }
+
+    function renderTasks() {
+      let list = document.getElementById("taskList");
+      list.innerHTML = "";
+      tasks.forEach((task, i) => {
+        let div = document.createElement("div");
+        div.className = `task ${task.priority}`;
+        div.innerHTML = `<div>
+          <strong>${task.text}</strong> <em>(${task.category})</em>
+        </div>
+        <button onclick="removeTask(${i})">❌</button>`;
+        list.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
