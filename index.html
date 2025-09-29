@@ -151,7 +151,7 @@
   const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
   let filterCategory = null;
   const motivations = [
-    "💪 You’ve got this!",
+    "💪 You've got this!",
     "🌟 Keep shining!",
     "🚀 One step at a time!",
     "✨ Believe in yourself!",
@@ -242,9 +242,22 @@
   function renderCategories() {
     const catDiv = document.getElementById("categoryList");
     let categories = [...new Set(tasks.map(t => t.category))];
-    catDiv.innerHTML = `<div class="category ${filterCategory === null ? 'active' : ''}" onclick="setCategory(null)">🌏 All</div>`;
+    
+    // Clear and add "All" category
+    catDiv.innerHTML = '';
+    const allCat = document.createElement('div');
+    allCat.className = `category ${filterCategory === null ? 'active' : ''}`;
+    allCat.textContent = '🌏 All';
+    allCat.onclick = () => setCategory(null);
+    catDiv.appendChild(allCat);
+    
+    // Add other categories
     categories.forEach(c => {
-      catDiv.innerHTML += `<div class="category ${filterCategory === c ? 'active' : ''}" onclick="setCategory('${c}')">${c}</div>`;
+      const catEl = document.createElement('div');
+      catEl.className = `category ${filterCategory === c ? 'active' : ''}`;
+      catEl.textContent = c;
+      catEl.onclick = () => setCategory(c);
+      catDiv.appendChild(catEl);
     });
   }
 
@@ -263,10 +276,23 @@
     sorted.forEach((task) => {
       const div = document.createElement("div");
       div.className = `task ${task.priority}`;
-      div.innerHTML = `
-        <div>${task.text} <small>(${task.category})</small></div>
-        <button aria-label="Delete task" onclick="removeTask('${task.id}')">❌</button>
-      `;
+      
+      const taskContent = document.createElement("div");
+      const taskText = document.createTextNode(task.text);
+      const small = document.createElement("small");
+      small.textContent = ` (${task.category})`;
+      
+      taskContent.appendChild(taskText);
+      taskContent.appendChild(small);
+      
+      const deleteButton = document.createElement("button");
+      deleteButton.setAttribute('aria-label', 'Delete task');
+      deleteButton.textContent = '❌';
+      deleteButton.onclick = () => removeTask(task.id);
+      
+      div.appendChild(taskContent);
+      div.appendChild(deleteButton);
+      
       taskList.appendChild(div);
     });
   }
