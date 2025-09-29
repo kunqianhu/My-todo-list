@@ -6,21 +6,144 @@
 <title>🌸 Your Personal To-do List 💪</title>
 <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet" />
 <style>
+  :root {
+    --primary-color: #d26991;
+    --primary-light: #ffe6f0;
+    --primary-dark: #c75482;
+    --text-color: #444;
+    --accent-color: #f2a2c0;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     font-family: 'Comic Neue', cursive, sans-serif;
     background: linear-gradient(135deg, #fff0f6, #f0f9ff);
     padding: 20px;
-    color: #444;
+    color: var(--text-color);
     text-align: center;
     position: relative;
     overflow-x: hidden;
+    margin: 0;
+    min-height: 100vh;
   }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+
   h1 {
-    font-size: 2.4em;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
     margin-bottom: 15px;
-    color: #d26991;
-    white-space: nowrap; /* prevent wrapping */
+    color: var(--primary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  @media (min-width: 768px) {
+    .input-section {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .input-group {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  input, select, button {
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1.5px solid var(--accent-color);
+    margin: 0;
+    font-family: 'Comic Neue', cursive, sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #a34265;
+    width: 100%;
+  }
+
+  @media (min-width: 768px) {
+    input, select {
+      width: auto;
+    }
+  }
+
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 8px rgba(210, 105, 145, 0.4);
+  }
+
+  button {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+
+  @media (min-width: 768px) {
+    button {
+      width: auto;
+      min-width: 120px;
+    }
+  }
+
+  button:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+  }
+
+  .category-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 0 0 14px 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+  }
+
+  .category-suggestion {
+    padding: 10px 16px;
+    text-align: left;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    color: #a34265;
+    font-weight: 600;
+  }
+
+  .category-suggestion:last-child {
+    border-bottom: none;
+  }
+
+  .category-suggestion:hover {
+    background-color: var(--primary-light);
+  }
+
   .category-list {
     display: flex;
     justify-content: center;
@@ -28,22 +151,25 @@
     margin: 15px 0;
     gap: 10px;
   }
+
   .category {
-    background: #ffe6f0;
+    background: var(--primary-light);
     border-radius: 25px;
     padding: 8px 18px;
     box-shadow: 0 2px 6px rgba(210, 105, 145, 0.3);
     cursor: pointer;
     font-weight: 700;
     user-select: none;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
     color: #c75a87;
   }
+
   .category.active, .category:hover {
-    background-color: #d26991;
+    background-color: var(--primary-color);
     color: #fff;
     box-shadow: 0 4px 12px rgba(210, 105, 145, 0.5);
   }
+
   .task {
     display: flex;
     justify-content: space-between;
@@ -57,36 +183,61 @@
     font-weight: 600;
     font-size: 1.05rem;
   }
+
+  .task-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 480px) {
+    .task-content {
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    }
+  }
+
   .high { border-left: 8px solid #e75480; }
   .medium { border-left: 8px solid #f2a2c0; }
   .low { border-left: 8px solid #f9c3db; }
-  input, select, button {
-    padding: 10px 14px;
-    border-radius: 14px;
-    border: 1.5px solid #f2a2c0;
-    margin: 6px 4px;
-    font-family: 'Comic Neue', cursive, sans-serif;
-    font-weight: 600;
-    font-size: 1rem;
+
+  .task-category {
+    font-size: 0.85rem;
     color: #a34265;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 5px;
   }
-  input:focus, select:focus {
-    outline: none;
-    border-color: #d26991;
-    box-shadow: 0 0 8px rgba(210, 105, 145, 0.4);
+
+  @media (min-width: 480px) {
+    .task-category {
+      margin-top: 0;
+    }
   }
-  button {
-    background: #d26991;
+
+  .task-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .delete-btn {
+    background: transparent;
     border: none;
-    color: white;
-    font-weight: 700;
+    color: #e75480;
+    font-size: 1.2rem;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    padding: 5px;
+    width: auto;
+    min-width: auto;
   }
-  button:hover {
-    background: #c75482;
-    transform: scale(1.1);
+
+  .delete-btn:hover {
+    background: transparent;
+    transform: scale(1.2);
   }
+
   .motivation {
     margin-top: 18px;
     font-style: italic;
@@ -94,6 +245,7 @@
     color: #b15681;
     min-height: 2.2em;
   }
+
   /* Pop emojis container */
   .emoji-pop-container {
     position: fixed;
@@ -102,6 +254,7 @@
     overflow: visible;
     z-index: 9999;
   }
+
   .emoji-pop {
     position: absolute;
     font-size: 24px;
@@ -109,6 +262,7 @@
     animation: popUp 1.2s forwards ease-out;
     user-select: none;
   }
+
   @keyframes popUp {
     0% {
       transform: translateY(0) scale(0.6);
@@ -123,27 +277,50 @@
       opacity: 0;
     }
   }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #a34265;
+  }
+
+  .empty-state img {
+    max-width: 200px;
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
 </style>
 </head>
 <body>
 
-<h1>🌸 Your personal Todo List 💪</h1>
-<div>
-  <input id="taskInput" type="text" placeholder="✍️ Task" autocomplete="off" />
-  <input id="categoryInput" type="text" placeholder="📂 Category (your choice)" autocomplete="off" />
-  <select id="priorityInput" aria-label="Priority">
-    <option value="high">🔥 High</option>
-    <option value="medium">🌟 Medium</option>
-    <option value="low">🍃 Low</option>
-  </select>
-  <button onclick="addTask()">➕ Add</button>
+<div class="container">
+  <h1>🌸 Your Personal To-do List 💪</h1>
+  
+  <div class="input-section">
+    <div class="input-group">
+      <input id="taskInput" type="text" placeholder="✍️ Task" autocomplete="off" />
+    </div>
+    
+    <div class="input-group">
+      <input id="categoryInput" type="text" placeholder="📂 Category (your choice)" autocomplete="off" />
+      <div class="category-suggestions" id="categorySuggestions"></div>
+    </div>
+    
+    <select id="priorityInput" aria-label="Priority">
+      <option value="high">🔥 High</option>
+      <option value="medium">🌟 Medium</option>
+      <option value="low">🍃 Low</option>
+    </select>
+    
+    <button onclick="addTask()">➕ Add Task</button>
+  </div>
+
+  <div class="category-list" id="categoryList" aria-label="Categories"></div>
+
+  <div id="taskList" style="margin-top: 20px;"></div>
+
+  <div class="motivation" id="motivationText" aria-live="polite" aria-atomic="true"></div>
 </div>
-
-<div class="category-list" id="categoryList" aria-label="Categories"></div>
-
-<div id="taskList" style="margin-top: 20px;"></div>
-
-<div class="motivation" id="motivationText" aria-live="polite" aria-atomic="true"></div>
 
 <div class="emoji-pop-container" id="emojiPopContainer"></div>
 
@@ -158,6 +335,15 @@
     "🌈 Small steps = Big changes!"
   ];
   const popEmojis = ['✨', '💖', '🌸', '💫', '🌷', '🍥', '🌟'];
+
+  // DOM Elements
+  const taskInput = document.getElementById("taskInput");
+  const categoryInput = document.getElementById("categoryInput");
+  const categorySuggestions = document.getElementById("categorySuggestions");
+  const priorityInput = document.getElementById("priorityInput");
+  const categoryList = document.getElementById("categoryList");
+  const taskList = document.getElementById("taskList");
+  const motivationText = document.getElementById("motivationText");
 
   function randomMotivation() {
     return motivations[Math.floor(Math.random() * motivations.length)];
@@ -187,15 +373,10 @@
   }
 
   function generateId() {
-    // simple unique ID based on timestamp + random number
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
 
   function addTask() {
-    const taskInput = document.getElementById("taskInput");
-    const categoryInput = document.getElementById("categoryInput");
-    const priorityInput = document.getElementById("priorityInput");
-
     let text = taskInput.value.trim();
     let category = categoryInput.value.trim();
     let priority = priorityInput.value;
@@ -240,67 +421,157 @@
   }
 
   function renderCategories() {
-    const catDiv = document.getElementById("categoryList");
-    let categories = [...new Set(tasks.map(t => t.category))];
+    categoryList.innerHTML = "";
     
-    // Clear and add "All" category
-    catDiv.innerHTML = '';
-    const allCat = document.createElement('div');
-    allCat.className = `category ${filterCategory === null ? 'active' : ''}`;
-    allCat.textContent = '🌏 All';
-    allCat.onclick = () => setCategory(null);
-    catDiv.appendChild(allCat);
+    // Add "All" category
+    const allCategory = document.createElement("div");
+    allCategory.className = `category ${filterCategory === null ? 'active' : ''}`;
+    allCategory.textContent = "🌏 All";
+    allCategory.onclick = () => setCategory(null);
+    categoryList.appendChild(allCategory);
     
-    // Add other categories
-    categories.forEach(c => {
-      const catEl = document.createElement('div');
-      catEl.className = `category ${filterCategory === c ? 'active' : ''}`;
-      catEl.textContent = c;
-      catEl.onclick = () => setCategory(c);
-      catDiv.appendChild(catEl);
+    // Get unique categories
+    const categories = [...new Set(tasks.map(t => t.category))];
+    
+    categories.forEach(category => {
+      const categoryEl = document.createElement("div");
+      categoryEl.className = `category ${filterCategory === category ? 'active' : ''}`;
+      categoryEl.textContent = category;
+      categoryEl.onclick = () => setCategory(category);
+      categoryList.appendChild(categoryEl);
     });
   }
 
   function renderTasks() {
-    const taskList = document.getElementById("taskList");
     taskList.innerHTML = "";
 
-    let sorted = [...tasks].sort((a,b) => {
-      const order = {high: 1, medium: 2, low: 3};
-      return order[a.priority] - order[b.priority];
-    });
-    if (filterCategory) {
-      sorted = sorted.filter(t => t.category === filterCategory);
+    if (tasks.length === 0) {
+      taskList.innerHTML = `
+        <div class="empty-state">
+          <svg width="150" height="150" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15" stroke="#d26991" stroke-width="2"/>
+            <path d="M12 12H15" stroke="#d26991" stroke-width="2" stroke-linecap="round"/>
+            <path d="M12 16H15" stroke="#d26991" stroke-width="2" stroke-linecap="round"/>
+            <path d="M9 9C9 8.44772 8.55228 8 8 8C7.44772 8 7 8.44772 7 9C7 9.55228 7.44772 10 8 10C8.55228 10 9 9.55228 9 9Z" fill="#d26991"/>
+            <path d="M9 13C9 12.4477 8.55228 12 8 12C7.44772 12 7 12.4477 7 13C7 13.5523 7.44772 14 8 14C8.55228 14 9 13.5523 9 13Z" fill="#d26991"/>
+            <path d="M9 17C9 16.4477 8.55228 16 8 16C7.44772 16 7 16.4477 7 17C7 17.5523 7.44772 18 8 18C8.55228 18 9 17.5523 9 17Z" fill="#d26991"/>
+            <path d="M13 5C13 3.89543 13.8954 3 15 3H17C18.1046 3 19 3.89543 19 5V5C19 6.10457 18.1046 7 17 7H15C13.8954 7 13 6.10457 13 5V5Z" stroke="#d26991" stroke-width="2"/>
+          </svg>
+          <h3>No tasks yet!</h3>
+          <p>Add your first task to get started 🌟</p>
+        </div>
+      `;
+      return;
     }
 
-    sorted.forEach((task) => {
-      const div = document.createElement("div");
-      div.className = `task ${task.priority}`;
+    let filteredTasks = [...tasks];
+    if (filterCategory) {
+      filteredTasks = filteredTasks.filter(t => t.category === filterCategory);
+    }
+
+    // Sort by priority
+    const sortedTasks = filteredTasks.sort((a, b) => {
+      const order = { high: 1, medium: 2, low: 3 };
+      return order[a.priority] - order[b.priority];
+    });
+
+    sortedTasks.forEach(task => {
+      const taskEl = document.createElement("div");
+      taskEl.className = `task ${task.priority}`;
       
       const taskContent = document.createElement("div");
-      const taskText = document.createTextNode(task.text);
-      const small = document.createElement("small");
-      small.textContent = ` (${task.category})`;
+      taskContent.className = "task-content";
+      
+      const taskText = document.createElement("div");
+      taskText.textContent = task.text;
+      
+      const taskCategory = document.createElement("span");
+      taskCategory.className = "task-category";
+      taskCategory.textContent = task.category;
+      
+      const taskActions = document.createElement("div");
+      taskActions.className = "task-actions";
+      
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-btn";
+      deleteBtn.innerHTML = "❌";
+      deleteBtn.setAttribute("aria-label", "Delete task");
+      deleteBtn.onclick = () => removeTask(task.id);
       
       taskContent.appendChild(taskText);
-      taskContent.appendChild(small);
+      taskContent.appendChild(taskCategory);
+      taskActions.appendChild(deleteBtn);
       
-      const deleteButton = document.createElement("button");
-      deleteButton.setAttribute('aria-label', 'Delete task');
-      deleteButton.textContent = '❌';
-      deleteButton.onclick = () => removeTask(task.id);
+      taskEl.appendChild(taskContent);
+      taskEl.appendChild(taskActions);
       
-      div.appendChild(taskContent);
-      div.appendChild(deleteButton);
-      
-      taskList.appendChild(div);
+      taskList.appendChild(taskEl);
     });
   }
 
   function updateMotivation() {
-    const motivationText = document.getElementById("motivationText");
     motivationText.textContent = randomMotivation();
   }
+
+  // Category suggestions functionality
+  function showCategorySuggestions() {
+    const inputValue = categoryInput.value.toLowerCase().trim();
+    
+    if (!inputValue) {
+      categorySuggestions.style.display = 'none';
+      return;
+    }
+    
+    // Get unique categories that match the input
+    const categories = [...new Set(tasks.map(t => t.category))];
+    const matchingCategories = categories.filter(cat => 
+      cat.toLowerCase().includes(inputValue)
+    );
+    
+    categorySuggestions.innerHTML = '';
+    
+    if (matchingCategories.length === 0) {
+      categorySuggestions.style.display = 'none';
+      return;
+    }
+    
+    matchingCategories.forEach(category => {
+      const suggestion = document.createElement('div');
+      suggestion.className = 'category-suggestion';
+      suggestion.textContent = category;
+      suggestion.onclick = () => {
+        categoryInput.value = category;
+        categorySuggestions.style.display = 'none';
+      };
+      categorySuggestions.appendChild(suggestion);
+    });
+    
+    categorySuggestions.style.display = 'block';
+  }
+
+  // Event listeners
+  categoryInput.addEventListener('input', showCategorySuggestions);
+  categoryInput.addEventListener('focus', showCategorySuggestions);
+  
+  // Hide suggestions when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!categoryInput.contains(e.target) && !categorySuggestions.contains(e.target)) {
+      categorySuggestions.style.display = 'none';
+    }
+  });
+
+  // Allow adding task with Enter key
+  taskInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      addTask();
+    }
+  });
+
+  categoryInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      addTask();
+    }
+  });
 
   // Initialize
   renderTasks();
