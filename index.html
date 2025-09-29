@@ -21,7 +21,7 @@
   body {
     font-family: 'Comic Neue', cursive, sans-serif;
     background: linear-gradient(135deg, #fff0f6, #f0f9ff);
-    padding: 20px;
+    padding: 20px 15px;
     color: var(--text-color);
     text-align: center;
     position: relative;
@@ -33,16 +33,15 @@
   .container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 0 15px;
   }
 
   h1 {
-    font-size: clamp(1.8rem, 4vw, 2.4rem);
-    margin-bottom: 15px;
+    font-size: clamp(1.5rem, 6vw, 2.4rem);
+    margin: 0 0 15px 0;
     color: var(--primary-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.3;
+    word-break: break-word;
+    padding: 0 10px;
   }
 
   .input-section {
@@ -64,7 +63,14 @@
   .input-group {
     position: relative;
     flex: 1;
-    min-width: 200px;
+    min-width: 0;
+    width: 100%;
+  }
+
+  @media (min-width: 480px) {
+    .input-group {
+      min-width: 200px;
+    }
   }
 
   input, select, button {
@@ -125,6 +131,8 @@
     max-height: 200px;
     overflow-y: auto;
     display: none;
+    border: 1.5px solid var(--accent-color);
+    border-top: none;
   }
 
   .category-suggestion {
@@ -134,6 +142,7 @@
     border-bottom: 1px solid #f0f0f0;
     color: #a34265;
     font-weight: 600;
+    transition: background-color 0.2s ease;
   }
 
   .category-suggestion:last-child {
@@ -162,6 +171,13 @@
     user-select: none;
     transition: all 0.3s ease;
     color: #c75a87;
+    font-size: 0.9rem;
+  }
+
+  @media (min-width: 480px) {
+    .category {
+      font-size: 1rem;
+    }
   }
 
   .category.active, .category:hover {
@@ -174,20 +190,28 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 18px;
+    padding: 12px 15px;
     margin: 8px 0;
     background: #fff0f6;
     border-radius: 16px;
     box-shadow: 0 2px 7px rgba(210, 105, 145, 0.2);
     text-align: left;
     font-weight: 600;
-    font-size: 1.05rem;
+    font-size: 1rem;
+  }
+
+  @media (min-width: 480px) {
+    .task {
+      padding: 12px 18px;
+      font-size: 1.05rem;
+    }
   }
 
   .task-content {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   @media (min-width: 480px) {
@@ -202,6 +226,12 @@
   .medium { border-left: 8px solid #f2a2c0; }
   .low { border-left: 8px solid #f9c3db; }
 
+  .task-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .task-category {
     font-size: 0.85rem;
     color: #a34265;
@@ -209,6 +239,7 @@
     padding: 2px 8px;
     border-radius: 10px;
     margin-top: 5px;
+    flex-shrink: 0;
   }
 
   @media (min-width: 480px) {
@@ -220,6 +251,7 @@
   .task-actions {
     display: flex;
     gap: 8px;
+    flex-shrink: 0;
   }
 
   .delete-btn {
@@ -244,6 +276,7 @@
     font-size: 1.1rem;
     color: #b15681;
     min-height: 2.2em;
+    padding: 0 10px;
   }
 
   /* Pop emojis container */
@@ -483,6 +516,7 @@
       taskContent.className = "task-content";
       
       const taskText = document.createElement("div");
+      taskText.className = "task-text";
       taskText.textContent = task.text;
       
       const taskCategory = document.createElement("span");
@@ -513,29 +547,36 @@
     motivationText.textContent = randomMotivation();
   }
 
-  // Category suggestions functionality
+  // Category suggestions functionality - FIXED VERSION
   function showCategorySuggestions() {
     const inputValue = categoryInput.value.toLowerCase().trim();
     
+    // Get unique categories from existing tasks
+    const categories = [...new Set(tasks.map(t => t.category))];
+    
+    // If no input, show all categories (but limit to 5)
     if (!inputValue) {
-      categorySuggestions.style.display = 'none';
+      displayCategorySuggestions(categories.slice(0, 5));
       return;
     }
     
-    // Get unique categories that match the input
-    const categories = [...new Set(tasks.map(t => t.category))];
+    // Filter categories that match the input
     const matchingCategories = categories.filter(cat => 
       cat.toLowerCase().includes(inputValue)
     );
     
+    displayCategorySuggestions(matchingCategories);
+  }
+  
+  function displayCategorySuggestions(categories) {
     categorySuggestions.innerHTML = '';
     
-    if (matchingCategories.length === 0) {
+    if (categories.length === 0) {
       categorySuggestions.style.display = 'none';
       return;
     }
     
-    matchingCategories.forEach(category => {
+    categories.forEach(category => {
       const suggestion = document.createElement('div');
       suggestion.className = 'category-suggestion';
       suggestion.textContent = category;
@@ -549,7 +590,7 @@
     categorySuggestions.style.display = 'block';
   }
 
-  // Event listeners
+  // Event listeners for category suggestions - FIXED
   categoryInput.addEventListener('input', showCategorySuggestions);
   categoryInput.addEventListener('focus', showCategorySuggestions);
   
